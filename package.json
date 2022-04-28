@@ -1,0 +1,75 @@
+{
+  "name": "devtoberfest",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^5.3.2",
+    "cds-dbm": "^0.0.26",
+    "cds-pg": "^0.0.51",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "mbt": "~1.0.17"
+  },
+  "cds": {
+    "build": {
+      "tasks": [
+        {
+          "use": "node-cf",
+          "for": "node-cf",
+          "src": "srv"
+        },
+        {
+          "use": "postgres-cf",
+          "for": "postgres-cf",
+          "src": "db",
+          "options": {
+            "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
+          }
+        }
+      ]
+    },
+    "requires": {
+      "db": {
+        "kind": "database"
+      },
+      "database": {
+        "dialect": "plain",
+        "impl": "cds-pg",
+        "model": [
+          "srv"
+        ],
+        "credentials": {
+          "host": "localhost",
+          "port": 5432,
+          "database": "devtoberfest",
+          "user": "postgres",
+          "password": "Qbase2021@PGS",
+          "schema": "public"
+        }
+      }
+    },
+    "migrations": {
+      "db": {
+        "schema": {
+          "default": "public",
+          "clone": "_cdsdbm_clone",
+          "reference": "_cdsdbm_ref"
+        },
+        "deploy": {
+          "tmpFile": "tmp/_autodeploy.json",
+          "undeployFile": "db/undeploy.json"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "start": "npx cds run",
+    "start:docker": "docker-compose up",
+    "build:cf": "mbt build",
+    "deploy:cf": "cf deploy mta_archives/devtoberfest_1.0.0.mtar"
+  }
+}
