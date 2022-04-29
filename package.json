@@ -1,6 +1,7 @@
 {
   // Test commit
-  
+  // Hotfix 1
+
   "name": "devtoberfest",
   "version": "1.0.0",
   "description": "A simple CAP project.",
