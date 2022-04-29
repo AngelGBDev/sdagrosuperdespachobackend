@@ -15,3 +15,5 @@ entity Votes: cuid {
   createdAt: DateTime;
   project: Association to one Projects;
 }
+
+// cambios feature 4
