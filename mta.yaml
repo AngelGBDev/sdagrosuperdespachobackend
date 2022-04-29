@@ -40,7 +40,7 @@ modules:
       memory: 512MB
       tasks:
       - name: deploy_to_postgresql
-        command: chmod 755 deploy.sh && ./deploy.sh
+        command: ./deploy.sh
         disk-quota: 2GB
         memory: 512MB      
     build-parameters:

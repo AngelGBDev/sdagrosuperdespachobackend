@@ -1,10 +1,4 @@
 {
-  // Test commit
-  // Hotfix 2
-
-  // feature 2
-  // feature 2.1
-
   "name": "devtoberfest",
   "version": "1.0.0",
   "description": "A simple CAP project.",
@@ -12,50 +6,39 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@sap/cds": "^5.3.2",
-    "cds-dbm": "^0.0.26",
-    "cds-pg": "^0.0.51",
+    "@sap/cds": "5.1.5",
+    "cds-dbm": "~0.0.26",
+    "cds-pg": "0.0.51",
     "express": "^4"
   },
   "devDependencies": {
-    "mbt": "~1.0.17"
+    "mbt": "~1.2.1"
   },
   "cds": {
     "build": {
-      "tasks": [
-        {
-          "use": "node-cf",
-          "for": "node-cf",
-          "src": "srv"
-        },
-        {
-          "use": "postgres-cf",
-          "for": "postgres-cf",
-          "src": "db",
-          "options": {
-            "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
-          }
-        }
-      ]
+        "tasks": [
+            {
+                "use": "node-cf",
+                "src": "srv"
+            },
+            {
+                "use": "postgres-cf",
+                "src": "db",
+                "options": {
+                    "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
+                }
+            }
+        ]
     },
     "requires": {
       "db": {
         "kind": "database"
       },
       "database": {
-        "dialect": "plain",
         "impl": "cds-pg",
         "model": [
           "srv"
-        ],
-        "credentials": {
-          "host": "localhost",
-          "port": 5432,
-          "database": "devtoberfest",
-          "user": "postgres",
-          "password": "Qbase2021@PGS",
-          "schema": "public"
-        }
+        ]
       }
     },
     "migrations": {

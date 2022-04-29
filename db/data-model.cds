@@ -1,4 +1,3 @@
-
 using { cuid } from '@sap/cds/common';
 
 namespace db;
@@ -15,5 +14,3 @@ entity Votes: cuid {
   createdAt: DateTime;
   project: Association to one Projects;
 }
-
-// cambios feature 4
