@@ -15,5 +15,3 @@ entity Votes: cuid {
   createdAt: DateTime;
   project: Association to one Projects;
 }
-
-
