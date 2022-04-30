@@ -5,7 +5,7 @@ services:
     image: postgres:alpine
     restart: always
     environment:
-      POSTGRES_PASSWORD: 0ad2e8b43882
+      POSTGRES_PASSWORD: Qbase2021@PGS
     ports:
       - '5432:5432'
   adminer:

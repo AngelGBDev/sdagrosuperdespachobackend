@@ -40,11 +40,11 @@
           "srv"
         ],
         "credentials": {
-            "host": "postgres-6c75acdd-f1be-4526-9f0b-2f20d97b56d3.ce4jcviyvogb.eu-central-1.rds.amazonaws.com",
-            "port": 4249,
-            "database": "pqtgYkTYQSFY",
-            "user": "d7159a058ce6",
-            "password": "0ad2e8b43882"
+            "host": "localhost",
+            "port": 5432,
+            "database": "devtoberfest",
+            "user": "postgres",
+            "password": "Qbase2021@PGS"
         }
       }
     },

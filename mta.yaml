@@ -53,7 +53,7 @@ resources:
     parameters:
       path: ./pg-options.json
       service: postgresql-db
-      service-plan: trial
+      service-plan: free
       skip-service-updates:
         parameters: true
     type: org.cloudfoundry.managed-service
