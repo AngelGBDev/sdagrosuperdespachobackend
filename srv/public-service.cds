@@ -1,6 +1,17 @@
-using db from '../db/data-model';
+using {csw} from '../db/schema';
 
-service PublicService {
-    entity Projects as projection on db.Projects;
-    entity Votes as projection on db.Votes;
+@(requires : 'authenticated-user')
+service PublicService {    
+
+  @readonly
+  entity Projects   as projection on csw.Projects;
+
+  @readonly
+  entity Votes      as projection on csw.Votes;
+
+  @readonly
+  entity UserScopes {
+    key username : String;
+        is_admin : Boolean;
+  };
 }

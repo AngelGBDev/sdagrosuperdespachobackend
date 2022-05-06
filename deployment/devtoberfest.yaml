@@ -1,0 +1,216 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: postgresql-pass
+stringData:
+  password: eeff79efca13
+# ---
+# apiVersion: servicecatalog.k8s.io/v1beta1
+# kind: ServiceInstance
+# metadata:
+#   name: devtoberfest-identity
+# spec:
+#   clusterServiceClassExternalName: identity
+#   clusterServicePlanExternalName: application
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devtoberfest-postgresql
+  labels:
+    app: devtoberfest
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: devtoberfest
+    tier: postgresql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pv-claim
+  labels:
+    app: devtoberfest
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devtoberfest-postgresql
+  labels:
+    app: devtoberfest
+spec:
+  selector:
+    matchLabels:
+      app: devtoberfest
+      tier: postgresql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: devtoberfest
+        tier: postgresql
+    spec:
+      containers:
+      - image: postgres:alpine
+        name: postgresql
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgresql-pass
+              key: password
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        volumeMounts:
+        - name: postgresql-persistent-storage
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+      volumes:
+      - name: postgresql-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgresql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devtoberfest
+  labels:
+    app: devtoberfest
+spec:
+  ports:
+    - name: http
+      port: 4004
+  selector:
+    app: devtoberfest
+    tier: frontend
+---
+apiVersion: gateway.kyma-project.io/v1alpha1
+kind: APIRule
+metadata:
+  labels:
+    app: devtoberfest
+  name: devtoberfest
+spec:
+  service:
+    host: devtoberfest
+    name: devtoberfest
+    port: 4004
+  gateway: kyma-gateway.kyma-system.svc.cluster.local
+  rules:
+    - path: /.*
+      methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE" ]
+      accessStrategies:
+        - handler: noop
+      mutators: []
+---
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: devtoberfest-postgresql-secret
+    type: opaque
+    stringData:
+      VCAP_SERVICES: >
+        {
+          "postgres": [
+            {
+                "name": "postgres",
+                "label": "postgres",
+                "tags": [
+                  "plain",
+                  "relational",
+                  "database"
+                ],
+                "credentials": {
+                  "host": "postgres-72afb79b-6572-424b-be94-ae11a4a05956.cqryblsdrbcs.us-east-1.rds.amazonaws.com",
+                  "port": "3363",
+                  "database": "RoLfxCZKhPcI",
+                  "user": "5b159c6bd544",
+                  "password": "eeff79efca13"
+                }
+            }
+          ]
+        }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: devtoberfest-db-init
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      initContainers:
+      - name: init-service-devtoberfest-postgresql
+        image: busybox:1.28
+        command: ['sh', '-c', 
+          '
+          until nslookup devtoberfest-postgresql; 
+            do echo waiting for service devtoberfest-postgresql; 
+            sleep 2; 
+          done;
+          sleep 5;
+          ']
+      containers:
+        - name: devtoberfest-db-init
+          image: gregorwolf/pg-devtoberfest-db:latest
+          imagePullPolicy: "Always"
+          command: ['sh', '-c', 
+            "echo $JAVA_HOME && 
+            npm -v && 
+            jq --version && 
+            npx cds-dbm --version &&
+            npx cds-dbm deploy --create-db -l delta -a
+            "]
+          envFrom:
+            - secretRef:
+                name: devtoberfest-postgresql-secret
+      restartPolicy: OnFailure
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: devtoberfest
+  labels:
+    app: devtoberfest
+spec:
+  selector:
+    matchLabels:
+      app: devtoberfest
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: devtoberfest
+        tier: frontend
+      annotations:
+        sidecar.istio.io/inject: "true"
+#        traffic.sidecar.istio.io/excludeOutboundPorts: '5432'
+#        traffic.sidecar.istio.io/excludeOutboundIPRanges: 0.0.0.0/0
+    spec:
+      containers:
+      - image: gregorwolf/pg-devtoberfest:latest
+        name: devtoberfest
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 4004
+          name: devtoberfest
+        envFrom:
+        - secretRef:
+            name: devtoberfest-postgresql-secret

@@ -1,8 +1,7 @@
-using { cuid } from '@sap/cds/common';
+namespace csw;
 
-namespace db;
+using {cuid} from '@sap/cds/common';
 
-@sap.persistence.skip
 entity Projects: cuid {
   name : String(150);
   language: String(150);
@@ -10,7 +9,6 @@ entity Projects: cuid {
   votes: Association to many Votes on votes.project = $self;
 }
 
-@sap.persistence.skip
 entity Votes: cuid {
   username : String(150);
   createdAt: DateTime;
