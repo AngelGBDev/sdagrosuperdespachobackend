@@ -8,14 +8,12 @@ version: 1.0.0
 description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
-
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm install --production
-        - npx cds-dbm build --production
-
+  - builder: custom
+    commands:
+    - npm install
+    - npx -p @sap/cds-dk cds build 
 modules:
   # --------------------- SERVER MODULE ------------------------
   - name: devtoberfest-srv
@@ -28,33 +26,32 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: devtoberfest-database
-      
   - name: devtoberfest-db-deployer
     type: custom
     path: gen/db
     parameters:
-      buildpacks: [https://github.com/cloudfoundry/apt-buildpack#v0.2.2, nodejs_buildpack] 
+      buildpacks: [https://github.com/cloudfoundry/apt-buildpack#v0.2.10, nodejs_buildpack] 
       no-route: true
       no-start: true
-      disk-quota: 2GB
+      disk-quota: 3GB
       memory: 512MB
       tasks:
-      - name: deploy_to_postgresql
-        command: chmod 755 deploy.sh && ./deploy.sh
-        disk-quota: 2GB
-        memory: 512MB      
+      - name: deploy-to-postgresql
+        command: ./deploy.sh
+        disk-quota: 3GB
+        memory: 512MB
     build-parameters:
       ignore: ["node_modules/"]
     requires:
-      - name: devtoberfest-database      
-
+    - name: devtoberfest-database   
 resources:
   - name: devtoberfest-database
+    type: org.cloudfoundry.managed-service
     parameters:
       path: ./pg-options.json
       service: postgresql-db
-      service-plan: trial
+      service-plan: free
       skip-service-updates:
         parameters: true
-    type: org.cloudfoundry.managed-service
-    
+      service-tags:
+        - plain  
