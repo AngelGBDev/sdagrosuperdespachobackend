@@ -13,34 +13,7 @@ entity Projects: cuid {
 
 @sap.persistence.skip
 entity Votes: cuid {
-  Username : String(150);
+  username : String(150);
   createdAt: DateTime;
   project: Association to one Projects;
-}
-
-entity ZusuarioApp: cuid {
-  ZusuarioApp: String;
-  WerksLogist: String;
-  Lgort: String;
-  Msgno: String;
-  Msgv1: String;
-}
-
-entity DatosUsuarios: cuid {
-  uname: String;
-  nombreCompleto: String;
-  email: String;
-}
-
-entity CsCentros: cuid {
-  WerksLogist: String;
-  Name1: String;
-  almacenes: Association to many CsAlmacen on almacenes.centro = $self;
-}
-
-entity CsAlmacen: cuid {
-  Lgort: String;
-  Lgobe: String;
-  WerksLogist: String;
-  centro: Association to one CsCentros;
 }
