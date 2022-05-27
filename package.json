@@ -79,7 +79,15 @@
         "impl": "cds-pg",
         "model": [
           "srv"
-        ]
+        ],
+        "credentials": {
+          "host": "localhost",
+          "port": 5432,
+          "database": "devtoberfest",
+          "user": "postgres",
+          "password": "Qbase2021@PGS",
+          "schema": "public"
+        }
       }
     },
     "migrations": {
