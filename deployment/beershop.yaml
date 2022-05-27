@@ -4,12 +4,12 @@ type: Opaque
 metadata:
   name: postgresql-pass
 stringData:
-  password: eeff79efca13
+  password: postgres
 # ---
 # apiVersion: servicecatalog.k8s.io/v1beta1
 # kind: ServiceInstance
 # metadata:
-#   name: devtoberfest-identity
+#   name: beershop-identity
 # spec:
 #   clusterServiceClassExternalName: identity
 #   clusterServicePlanExternalName: application
@@ -17,14 +17,14 @@ stringData:
 apiVersion: v1
 kind: Service
 metadata:
-  name: devtoberfest-postgresql
+  name: beershop-postgresql
   labels:
-    app: devtoberfest
+    app: beershop
 spec:
   ports:
     - port: 5432
   selector:
-    app: devtoberfest
+    app: beershop
     tier: postgresql
   clusterIP: None
 ---
@@ -33,7 +33,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgresql-pv-claim
   labels:
-    app: devtoberfest
+    app: beershop
 spec:
   accessModes:
     - ReadWriteOnce
@@ -44,20 +44,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devtoberfest-postgresql
+  name: beershop-postgresql
   labels:
-    app: devtoberfest
+    app: beershop
 spec:
   selector:
     matchLabels:
-      app: devtoberfest
+      app: beershop
       tier: postgresql
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: devtoberfest
+        app: beershop
         tier: postgresql
     spec:
       containers:
@@ -84,27 +84,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: devtoberfest
+  name: beershop
   labels:
-    app: devtoberfest
+    app: beershop
 spec:
   ports:
     - name: http
       port: 4004
   selector:
-    app: devtoberfest
+    app: beershop
     tier: frontend
 ---
 apiVersion: gateway.kyma-project.io/v1alpha1
 kind: APIRule
 metadata:
   labels:
-    app: devtoberfest
-  name: devtoberfest
+    app: beershop
+  name: beershop
 spec:
   service:
-    host: devtoberfest
-    name: devtoberfest
+    host: beershop
+    name: beershop
     port: 4004
   gateway: kyma-gateway.kyma-system.svc.cluster.local
   rules:
@@ -117,7 +117,7 @@ spec:
     apiVersion: v1
     kind: Secret
     metadata:
-      name: devtoberfest-postgresql-secret
+      name: beershop-postgresql-secret
     type: opaque
     stringData:
       VCAP_SERVICES: >
@@ -132,11 +132,11 @@ spec:
                   "database"
                 ],
                 "credentials": {
-                  "host": "postgres-72afb79b-6572-424b-be94-ae11a4a05956.cqryblsdrbcs.us-east-1.rds.amazonaws.com",
-                  "port": "3363",
-                  "database": "RoLfxCZKhPcI",
-                  "user": "5b159c6bd544",
-                  "password": "eeff79efca13"
+                  "host": "beershop-postgresql",
+                  "port": "5432",
+                  "database": "beershop",
+                  "user": "postgres",
+                  "password": "postgres"
                 }
             }
           ]
@@ -145,7 +145,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: devtoberfest-db-init
+  name: beershop-db-init
 spec:
   ttlSecondsAfterFinished: 100
   template:
@@ -154,19 +154,19 @@ spec:
         sidecar.istio.io/inject: 'true'
     spec:
       initContainers:
-      - name: init-service-devtoberfest-postgresql
+      - name: init-service-beershop-postgresql
         image: busybox:1.28
         command: ['sh', '-c', 
           '
-          until nslookup devtoberfest-postgresql; 
-            do echo waiting for service devtoberfest-postgresql; 
+          until nslookup beershop-postgresql; 
+            do echo waiting for service beershop-postgresql; 
             sleep 2; 
           done;
           sleep 5;
           ']
       containers:
-        - name: devtoberfest-db-init
-          image: gregorwolf/pg-devtoberfest-db:latest
+        - name: beershop-db-init
+          image: gregorwolf/pg-beershop-db:latest
           imagePullPolicy: "Always"
           command: ['sh', '-c', 
             "echo $JAVA_HOME && 
@@ -177,27 +177,27 @@ spec:
             "]
           envFrom:
             - secretRef:
-                name: devtoberfest-postgresql-secret
+                name: beershop-postgresql-secret
       restartPolicy: OnFailure
 
 ---
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
-  name: devtoberfest
+  name: beershop
   labels:
-    app: devtoberfest
+    app: beershop
 spec:
   selector:
     matchLabels:
-      app: devtoberfest
+      app: beershop
       tier: frontend
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: devtoberfest
+        app: beershop
         tier: frontend
       annotations:
         sidecar.istio.io/inject: "true"
@@ -205,12 +205,12 @@ spec:
 #        traffic.sidecar.istio.io/excludeOutboundIPRanges: 0.0.0.0/0
     spec:
       containers:
-      - image: gregorwolf/pg-devtoberfest:latest
-        name: devtoberfest
+      - image: gregorwolf/pg-beershop:latest
+        name: beershop
         imagePullPolicy: "Always"
         ports:
         - containerPort: 4004
-          name: devtoberfest
+          name: beershop
         envFrom:
         - secretRef:
-            name: devtoberfest-postgresql-secret
+            name: beershop-postgresql-secret

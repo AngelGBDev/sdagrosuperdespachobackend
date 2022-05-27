@@ -1,5 +1,5 @@
 {
-  "xsappname": "devtoberfest",
+  "xsappname": "pg-beershop",
   "tenant-mode": "dedicated",
   "scopes": [
     {

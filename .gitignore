@@ -1,29 +1,43 @@
-# CAP devtoberfest
-_out
-*.db
-connection.properties
-default-*.json
+.idea/
 gen/
-node_modules/
-target/
-
-# Web IDE, App Studio
-.che/
 .gen/
-
-# MTA
-*_mta_build_tmp
-*.mtar
-mta_archives/
-
-# Other
+node_modules/
+data.zip
+target/
+*.db
 .DS_Store
-*.orig
-*.log
+_out
 
-*.iml
-*.flattened-pom.xml
+*-env.json
 
-# IDEs
-# .vscode
-# .idea
+fioriHtmlRunner.html
+.*/fioriHtmlRunner.html
+visual_ext_index.html
+/webapp/visual_ext_index.html
+extended_runnable_file.html
+.*/extended_runnable_file.html
+sap-ui-cachebuster-info.json
+mock_preview_sapui5.html
+.*/mock_preview_sapui5.html
+UIAdaptation_index.html
+changes_preview.js
+AppVariant_index.html
+AppVariantPreviewPayload.zip
+mergedManifestDescriptor.json
+APIExternalProducer.js
+.*/APIExternalProducer.js
+/mta_archives/
+/mta-op*
+Makefile*
+db/beershop.db-journal
+preview.json
+cp.project.properties.json
+
+.cds_gen.log
+.env
+env_variables.yaml
+db-deployer/db
+db-deployer/srv
+db-deployer-apt/db
+db-deployer-apt/srv
+mtad.yaml

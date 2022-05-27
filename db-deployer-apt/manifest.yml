@@ -1,6 +1,6 @@
 ---
  applications:
- - name: devtoberfest-db-deployer-apt
+ - name: pg-beershop-db-deployer-apt
    memory: 512M
    disk_quota: 2G
    path: .

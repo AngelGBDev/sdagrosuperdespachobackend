@@ -1,5 +1,5 @@
 {
-  "name": "devtoberfest-db-deployer",
+  "name": "pg-beershop-db-deployer",
   "engines": {
     "node": "^14"
   },

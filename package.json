@@ -1,84 +1,93 @@
 {
-  "name": "devtoberfest",
+  "name": "pg-beershop",
+  "engines": {
+    "node": "^14"
+  },
   "version": "1.0.0",
-  "description": "A simple CAP project.",
-  "repository": "<Add your repository here>",
-  "license": "UNLICENSED",  
+  "description": "Sample project to demonstrate the use of cds-pg",
+  "main": "index.js",
+  "scripts": {
+    "update": "run-p update:**",
+    "update:root": "npm update",
+    "update:app": "cd app && npm update",
+    "update:db-deployer-apt": "cd db-deployer-apt && npm update",
+    "test": "jest",
+    "docker:start:pg": "docker-compose -f stack.yml up -d",
+    "docker:start:pg:11": "docker-compose -f stack-pg-11.yml up -d",
+    "deploy:pg": "npx cds-dbm deploy --create-db",
+    "deploy:pg:load": "npx cds-dbm deploy --create-db --load-via delta",
+    "deploy:pg:data:delta": "npx cds-dbm load --via delta",
+    "deploy:pg:data:full": "npx cds-dbm load --via full",
+    "docker:start:cds": "docker run --env-file .env --name pg-beershop --network='pg-beershop_default' -p 4004:4004 -t gregorwolf/pg-beershop:latest",
+    "docker:start:ui": "docker run --name pg-beershop-ui --network='pg-beershop_default' -p 5000:5000 -t gregorwolf/pg-beershop-ui:latest",
+    "docker:restart:cds": "docker start -ai pg-beershop",
+    "docker:shell": "docker exec -it pg-beershop /bin/bash",
+    "start": "cds run",
+    "start:issue": "run-s deploy:pg start:cds",
+    "start:cds": "cds run",
+    "docker:stop:pg": "docker-compose -f stack.yml down",
+    "docker:stop:pg:11": "docker-compose -f stack-pg-11.yml down",
+    "build": "cds build --production",
+    "build:cf": "mbt build",
+    "build:cf:deployer": "mbt module-build -g -m=pg-beershop-db-deployer-apt,pg-beershop-srv,pg-beershop-app -a && mbt assemble",
+    "build:ElasticBeanstalk": "run-s build build:zipsrv",
+    "build:zipsrv": "cd gen/srv && zip -r ../srv.zip .",
+    "build:docker": "run-s build build:docker:srv",
+    "build:docker:db": "docker build -t gregorwolf/pg-beershop-db:latest -f db-deployer-kubernetes/Dockerfile .",
+    "build:docker:srv": "docker build -t gregorwolf/pg-beershop:latest .",
+    "build:docker:ui": "docker build -t gregorwolf/pg-beershop-ui:latest app",
+    "push:docker": "docker push gregorwolf/pg-beershop:latest",
+    "push:docker:db": "docker push gregorwolf/pg-beershop-db:latest",
+    "compile:tosql": "cds c srv -2 sql > beershop-cds.sql && node cdssql2pgsql.js > beershop.sql",
+    "create-service:pg:dbms": "cf create-service azure-postgresql-9-6-dbms basic azure-postgresql -c azure-pg-dbms.json",
+    "create-service:pg:db": "cf create-service azure-postgresql-9-6-database database beershop-database -c azure-pg-db.json",
+    "xsuaa:build": "cds compile srv/ --to xsuaa > xs-security.json",
+    "xsuaa:create": "cf create-service xsuaa application pg-beershop-uaa -c xs-security.json",
+    "xsuaa:update": "cf update-service pg-beershop-uaa -c xs-security.json",
+    "xsuaa:create:key": " cf create-service-key pg-beershop-uaa  pg-beershop-uaa-key",
+    "xsuaa:download:key": "cf service-key  pg-beershop-uaa pg-beershop-uaa-key",
+    "deploy:cf": "cf deploy mta_archives/pg-beershop_1.0.0.mtar --retries 0",
+    "deploy:cf:bg": "cf bg-deploy mta_archives/pg-beershop_1.0.0.mtar -f --no-confirm",
+    "deploy:cf:deployer:apt": "cf deploy mta_archives/pg-beershop_1.0.0.mtar -m pg-beershop-db-deployer-apt --retries 0",
+    "deploy:cf:adminer": "cf deploy mta_archives/pg-beershop_1.0.0.mtar -m pg-beershop-adminer --retries 0",
+    "deploy:cf:srv": "cf deploy mta_archives/pg-beershop_1.0.0.mtar -m pg-beershop-srv --retries 0",
+    "deploy:cf:update": "cf deploy mta_archives/pg-beershop_1.0.0.mtar -e update.mtaext --retries 0",
+    "test:db": "node test/test-db.js",
+    "undeploy:cf": "cf undeploy pg-beershop --delete-service-keys --delete-services --delete-service-brokers",
+    "copy:db:template": "copyfiles -u 1 -a ./db-deployer-apt/* ./db-deployer-apt/**/* gen/db-with-express",
+    "copy:db:gen": "copyfiles -u 2 -a ./gen/db/* ./gen/db/**/* gen/db-with-express",
+    "heroku-postbuild": "echo heroku postbuild skipped"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregorwolf/pg-beershop.git"
+  },
+  "keywords": [],
+  "author": "Gregor Wolf",
+  "license": "derived Beer-Ware",
   "dependencies": {
     "@sap/audit-logging": "^5.5.3",
-    "@sap/cds": "5.9.3",
-    "@sap/cds-odata-v2-adapter-proxy": "^1.8.16",
+    "@sap/cds": "5.9.5",
+    "@sap/cds-odata-v2-adapter-proxy": "^1.8.19",
     "@sap/xsenv": "^3.2.2",
     "@sap/xssec": "^3.2.13",
-    "applicationinsights": "^2.3.2",
+    "applicationinsights": "^2.3.3",
     "cds-pg": "0.1.28",
     "copyfiles": "^2.4.1",
     "express": "^4.18.1",
-    "passport": "^0.5.2",
+    "passport": "^0.5.3",
     "pg": "^8.7.3"
   },
   "devDependencies": {
-    "mbt": "~1.2.1",
-    "@sap/ux-specification": "^1.100.1",
+    "@sap/ux-specification": "^1.100.3",
     "cds-dbm": "^0.0.36",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
-    "jest": "^28.0.3",
+    "jest": "^28.1.0",
     "npm-run-all": "^4.1.5"
   },
-  "scripts": {
-    "start": "cds run",
-    "start:docker": "docker-compose up"
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "env": {
-      "es2020": true,
-      "node": true,
-      "jest": true,
-      "mocha": true
-    },
-    "globals": {
-      "SELECT": true,
-      "INSERT": true,
-      "UPDATE": true,
-      "DELETE": true,
-      "CREATE": true,
-      "DROP": true,
-      "CDL": true,
-      "CQL": true,
-      "CXL": true,
-      "cds": true
-    },
-    "rules": {
-      "no-console": "off",
-      "require-atomic-updates": "off"
-    }
-  },
   "cds": {
-    "build": {
-      "tasks": [
-        {
-          "for": "node-cf",
-          "src": "srv",
-          "options": {
-            "model": [
-              "db",
-              "srv"
-            ]
-          }
-        },
-        {
-          "use": "cds-dbm/dist/build/postgres-cf",
-          "for": "postgres-cf",
-          "src": "db",
-          "options": {
-            "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
-          }
-        }
-      ]
-    },
     "requires": {
       "db": {
         "kind": "database"
@@ -119,6 +128,32 @@
           "undeployFile": "db/undeploy.json"
         }
       }
+    },
+    "build": {
+      "tasks": [
+        {
+          "for": "node-cf",
+          "src": "srv",
+          "options": {
+            "model": [
+              "db",
+              "srv",
+              "app"
+            ]
+          }
+        },
+        {
+          "use": "cds-dbm/dist/build/postgres-cf",
+          "for": "postgres-cf",
+          "src": "db",
+          "options": {
+            "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
+          }
+        }
+      ]
     }
-  }
+  },
+  "sapux": [
+    "app/beers-manage"
+  ]
 }

@@ -1,0 +1,94 @@
+### Read Available Entities
+GET http://localhost:4004/beershop/
+Authorization: Basic bob:
+### Read Beers
+GET http://localhost:4004/beershop/Beers?$count=true
+Authorization: Basic bob:
+### Read Beers - $count
+GET http://localhost:4004/beershop/Beers/$count
+Authorization: Basic bob:
+### Read Beers and expand to Brewery
+GET http://localhost:4004/beershop/Beers?$expand=brewery
+Authorization: Basic bob:
+### Read Available Entities for admin endpoint
+GET http://localhost:4004/beershop-admin/
+Authorization: Basic alice:
+### Create new Beer
+POST http://localhost:4004/beershop-admin/Beers
+Content-Type: application/json;charset=UTF-8;IEEE754Compatible=true
+Authorization: Basic alice:
+
+{
+    "ID": "8489fdc3-63c8-4f23-b352-4c2d853a131b",
+    "name": "Steiner Export"
+}
+### Update the new Beer
+PATCH http://localhost:4004/beershop-admin/Beers(8489fdc3-63c8-4f23-b352-4c2d853a131b)
+Content-Type: application/json;charset=UTF-8;IEEE754Compatible=true
+Authorization: Basic alice:
+
+{
+    "ibu": 10,
+    "abv": "5.3"
+}
+### Delete the new Beer
+DELETE http://localhost:4004/beershop-admin/Beers(8489fdc3-63c8-4f23-b352-4c2d853a131b)
+Authorization: Basic alice:
+### Read Breweries
+GET http://localhost:4004/beershop/Breweries
+Authorization: Basic bob:
+### Read Breweries with $count
+GET http://localhost:4004/beershop/Breweries?$count=true&$select=ID,name&$skip=0&$top=30
+Authorization: Basic bob:
+### Read TypeChecks
+GET http://localhost:4004/beershop-admin/TypeChecks
+Authorization: Basic alice:
+Accept: application/json;charset=UTF-8;IEEE754Compatible=true
+### Create new TypeCheck
+POST http://localhost:4004/beershop-admin/TypeChecks
+Content-Type: application/json;charset=UTF-8;IEEE754Compatible=true
+Accept: application/json;charset=UTF-8;IEEE754Compatible=true
+Authorization: Basic alice:
+
+{
+    "ID": "169af1ff-9f74-4795-98f9-8be901e60c6b",
+    "type_Boolean": true,
+    "type_Int32": 42,
+    "type_Int64": "223372036854775807",
+    "type_Decimal": "0.4",
+    "type_Double": 3.1415926535897931,
+    "type_Date": "2020-09-27",
+    "type_Time": "11:42:42",
+    "type_DateTime": "2020-09-27T11:42:42.000Z",
+    "type_Timestamp": "2020-09-27T11:42:42.000Z",
+    "type_String": "Per Anhalter durch die Galaxis",
+    "type_LargeString": "Magna sit do quis culpa elit laborum culpa laboris excepteur. Proident qui culpa mollit ut ad enim. Reprehenderit aute occaecat ut ut est nostrud aliquip."
+}
+### Update new TypeCheck
+PATCH http://localhost:4004/beershop-admin/TypeChecks(169af1ff-9f74-4795-98f9-8be901e60c6b)
+Content-Type: application/json;charset=UTF-8;IEEE754Compatible=true
+Accept: application/json;charset=UTF-8;IEEE754Compatible=true
+Authorization: Basic alice:
+
+{
+    "type_Boolean": false,
+    "type_Int32": 4242,
+    "type_Int64": "323372036854775807",
+    "type_Decimal": "0.5",
+    "type_Double": 2.71828182846,
+    "type_Date": "2020-09-26",
+    "type_Time": "10:42:42",
+    "type_DateTime": "2020-09-26T10:42:42.000Z",
+    "type_Timestamp": "2020-09-26T10:42:42.000Z",
+    "type_String": "The Hitchhiker's Guide to the Galaxy",
+    "type_LargeString": "Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat."
+}
+
+### Delete new TypeCheck
+DELETE http://localhost:4004/beershop-admin/TypeChecks(169af1ff-9f74-4795-98f9-8be901e60c6b)
+Authorization: Basic alice:
+
+### Read TypeChecksWithDraft
+GET http://localhost:4004/beershop-admin/TypeChecksWithDraft
+Authorization: Basic alice:
+Accept: application/json;charset=UTF-8;IEEE754Compatible=true
