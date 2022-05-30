@@ -6,62 +6,25 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@sap/cds": "^5",
-    "@sap/cds-dk": "^4.9.2",
-    "@sap/cds-odata-v2-adapter-proxy": "^1.8.4",
-    "cds-dbm": "^0.0.36",
-    "cds-pg": "^0.1.28",
-    "express": "^4",
-    "fs": "0.0.1-security",
-    "handlebars": "^4.7.7",
-    "hdb": "^0.18.3",
-    "nodemailer": "^4.0.1",
-    "passport": "^0.5.2",
-    "path": "^0.12.7"
+    "@sap/cds": "5.1.5",
+    "cds-dbm": "~0.0.26",
+    "cds-pg": "0.0.51",
+    "express": "^4"
   },
   "devDependencies": {
+    "mbt": "~1.2.1",
     "sqlite3": "^5.0.2"
-  },
-  "scripts": {
-    "start": "npx cds run",
-    "start:docker": "docker-compose up",
-    "build:cf": "mbt build",
-    "deploy:cf": "cf deploy mta_archives/devtoberfest_1.0.0.mtar"
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "env": {
-      "es2020": true,
-      "node": true,
-      "jest": true,
-      "mocha": true
-    },
-    "globals": {
-      "SELECT": true,
-      "INSERT": true,
-      "UPDATE": true,
-      "DELETE": true,
-      "CREATE": true,
-      "DROP": true,
-      "CDL": true,
-      "CQL": true,
-      "CXL": true,
-      "cds": true
-    },
-    "rules": {
-      "no-console": "off",
-      "require-atomic-updates": "off"
-    }
   },
   "cds": {
     "build": {
       "tasks": [
         {
+          "use": "node-cf",
           "for": "node-cf",
           "src": "srv"
         },
         {
-          "use": "cds-dbm/dist/build/postgres-cf",
+          "use": "postgres-cf",
           "for": "postgres-cf",
           "src": "db",
           "options": {
@@ -103,5 +66,11 @@
         }
       }
     }
+  },
+  "scripts": {
+    "start": "npx cds run",
+    "start:docker": "docker-compose up",
+    "build:cf": "mbt build",
+    "deploy:cf": "cf deploy mta_archives/devtoberfest_1.0.0.mtar"
   }
 }
