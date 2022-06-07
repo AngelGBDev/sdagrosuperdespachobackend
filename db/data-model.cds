@@ -1,4 +1,3 @@
-
 using { cuid } from '@sap/cds/common';
 
 namespace db;
@@ -32,13 +31,15 @@ entity DatosUsuarios: cuid {
   uname: String(150);
   nombreCompleto: String(150);
   email: String(150);
+  centros: Association to many CsAlmacen on centros.usuario = $self;
+  almacenes: Association to many CsCentros on almacenes.usuario = $self;  
 }
 
 @sap.persistence.skip
 entity CsCentros: cuid {
   WerksLogist: String(150);
   Name1: String(150);
-  almacenes: Association to many CsAlmacen on almacenes.centro = $self;
+  usuario: Association to one DatosUsuarios;
 }
 
 @sap.persistence.skip
@@ -46,5 +47,18 @@ entity CsAlmacen: cuid {
   Lgort: String(150);
   Lgobe: String(150);
   WerksLogist: String(150);
-  centro: Association to one CsCentros;
+  usuario: Association to one DatosUsuarios;
+}
+
+@sap.persistence.skip
+entity DespConsTransportista: cuid {
+  Lifnr: String(150);
+  Name1: String(150);
+  Stcd1: String(150);
+  Parnr: String(150);
+}
+
+@sap.persistence.skip
+entity Contingencia: cuid {
+  Flag: String(1);
 }
